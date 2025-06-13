@@ -9,12 +9,17 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository  # ← ここを追加
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
       - name: Install dependencies
         run: pip install requests beautifulsoup4
+
       - name: Run tiketore.py
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
