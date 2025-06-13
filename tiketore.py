@@ -4,6 +4,7 @@ import os
 import json
 import hashlib
 import time
+import datetime
 
 url = 'https://tiketore.com/events/artist/52941'
 webhook_url = os.environ.get('DISCORD_WEBHOOK_URL')
@@ -26,13 +27,20 @@ for i in range(3):
         time.sleep(5)
 else:
     print('❌ 全てのリトライに失敗しました')
+    if webhook_url:
+        requests.post(webhook_url, json={"content": f"❌ チケトレ取得失敗（3回リトライ失敗）: {url}"})
     exit(1)
 
 soup = BeautifulSoup(response.text, 'html.parser')
 ticket_cards = soup.select('.p-ticketItem')
 
+now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# チケット出品なしでも通知を送るよう変更
 if not ticket_cards:
     print("🔍 チケット出品なし")
+    if webhook_url:
+        requests.post(webhook_url, json={"content": f"🔍 チケットはまだ出品されていません\n({now})"})
     exit(0)
 
 # ハッシュ化して通知済みを管理
@@ -60,9 +68,11 @@ for card in ticket_cards:
 
 if not new_tickets:
     print("🟡 新しいチケット出品なし")
+    if webhook_url:
+        requests.post(webhook_url, json={"content": f"🟡 新しいチケット出品はありませんでした\n({now})"})
     exit(0)
 
-# Discord通知
+# Discord通知（新規出品あり）
 message = "🎉 新しいチケット出品を検出！\n\n" + "\n\n".join(new_tickets)
 res = requests.post(webhook_url, json={"content": message})
 
