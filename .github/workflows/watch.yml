@@ -2,7 +2,7 @@ name: Watch Tiketore
 
 on:
   schedule:
-    - cron: '*/1 * * * *'  # 毎分実行
+    - cron: '*/5 * * * *'  # 毎分実行
   workflow_dispatch:
 
 jobs:
